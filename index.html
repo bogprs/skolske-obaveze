@@ -408,7 +408,7 @@ const views = {
   tpl(){
     let body;
     if (tplTab === 'daily') {
-      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас. Дугме ◐ укључује три стања за обавезу: зелено, наранџасто, празно.</p><div class="card">` +
+      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас. Дугме ◐ укључује три стања за обавезу: наранџасто, зелено, празно.</p><div class="card">` +
         S.dailyT.map((it, i) => `<div class="erow"><div class="f"><input type="text" value="${esc(it.text)}" data-c="dText" data-i="${i}" aria-label="Обавеза ${i+1}"></div>
           <button class="mini" data-a="dTri" data-i="${i}" aria-pressed="${!!it.tri}" aria-label="Три стања">◐</button><button class="mini" data-a="dMove" data-i="${i}" data-n="-1" aria-label="Горе">▲</button><button class="mini" data-a="dMove" data-i="${i}" data-n="1" aria-label="Доле">▼</button>
           <button class="mini del" data-a="dDel" data-i="${i}" aria-label="Обриши">✕</button></div>`).join('') +
@@ -486,7 +486,7 @@ const A = {
       const list = ds.k === 'd' ? (S.days[d] || {}).daily : weekItems(d);
       if (!list || !list[i]) return;
       const it = list[i];
-      it.done = it.tri ? (it.done === true ? 2 : it.done === 2 ? false : true) : !it.done;
+      it.done = it.tri ? (it.done === 2 ? true : it.done ? false : 2) : !it.done;   // empty -> orange -> green -> empty
       save(); render(true);
     };
     canEdit(d) ? doIt() : requirePin(() => { render(true); doIt(); });

@@ -1,6 +1,6 @@
 {
   "name": "Моје обавезе",
-  "short_name": "Обавезе",
+  "short_name": "Моје обавезе",
   "description": "Дневне обавезе и недељни план учења",
   "lang": "sr-Cyrl",
   "start_url": "./index.html",
