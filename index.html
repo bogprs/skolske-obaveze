@@ -179,8 +179,8 @@ function defaults(){
   const weeklyT = {};
   for (const k of ORDER) weeklyT[k] = [w('Српски', 'граматика'), w('Математика', 'Задаци')];
   return {
-    v: 1, tv: 2, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
-    dailyT: ['Вежбице', 'Домаћи', 'Паковање торбе', 'Учење', 'Матиш', 'Енглески', 'Фолклор', 'Суђе', 'Веш', 'Рециклажа'].map(d),
+    v: 1, tv: 3, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
+    dailyT: ['Вежбице', 'Домаћи', 'Паковање торбе', 'Учење', 'Соба сређивање 25 мин', 'Матиш', 'Енглески', 'Фолклор', 'Суђе', 'Веш', 'Рециклажа'].map(d),
     weeklyT, days: {}, weeks: {}
   };
 }
@@ -188,7 +188,16 @@ function defaults(){
 const OLD_DAILY = 'Намести кревет|Опери зубе ујутру и увече|Спакуј торбу за сутра|Читање 15 минута|Среди радни сто';
 const OLD_WEEKLY = 'Математика:домаћи задатак,Српски језик:читање|Енглески језик:нове речи,Свет око нас:|Математика:вежбање,Музичка култура:|Српски језик:писање,Енглески језик:|Математика:понављање,Ликовна култура:||';
 function migrate(){
-  if (S.tv >= 2) return;
+  if (S.tv >= 3) return;
+  if (S.tv === 2) {
+    const NEW = 'Соба сређивање 25 мин';
+    if (!S.dailyT.some(x => x.text === NEW)) {
+      const i = S.dailyT.findIndex(x => x.text === 'Учење');
+      S.dailyT.splice(i < 0 ? S.dailyT.length : i + 1, 0, {id: uid(), text: NEW});
+      syncTodayDaily();
+    }
+    S.tv = 3; save(); return;
+  }
   const fresh = defaults(), cur = mondayOf(todayIso());
   if (S.dailyT.map(x => x.text).join('|') === OLD_DAILY) { S.dailyT = fresh.dailyT; syncTodayDaily(); }
   if (ORDER.map(k => S.weeklyT[k].map(x => x.subject + ':' + x.text).join(',')).join('|') === OLD_WEEKLY) {
@@ -196,7 +205,7 @@ function migrate(){
     for (const mon of Object.keys(S.weeks)) if (mon >= cur && !S.weeks[mon].prepared && !ORDER.some(k => S.weeks[mon].d[k].some(x => x.done))) delete S.weeks[mon];
     ensureWeek(cur);
   }
-  S.tv = 2; save();
+  S.tv = 3; save();
 }
 let S;
 function load(){
