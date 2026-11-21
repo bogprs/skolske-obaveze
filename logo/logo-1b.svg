@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="#6C4AB6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <title>Прасе — опција 1Б (румени образи)</title>
+  <!-- head with large round ears -->
+  <path d="M76.7 44.1 A68 68 0 0 1 123.3 44.1 C126 18 158 8 168 24 C176 40 166 58 155.7 69 A68 68 0 1 1 44.3 69 C34 58 24 40 32 24 C42 8 74 18 76.7 44.1 Z"/>
+  <!-- eyes with check marks and lashes -->
+  <circle cx="70" cy="86" r="16" fill="#6C4AB6" stroke="none"/>
+  <circle cx="130" cy="86" r="16" fill="#6C4AB6" stroke="none"/>
+  <path d="M62.500 86 l5.500 5.500 l10.500 -11.500 M122.500 86 l5.500 5.500 l10.500 -11.500" stroke="#fff" stroke-width="4.800"/>
+  <path d="M54 76 l-5 -3.5 M59 70 l-3 -5 M146 76 l5 -3.5 M141 70 l3 -5" stroke-width="4"/>
+  <!-- blush cheeks -->
+  <ellipse cx="54" cy="120" rx="10" ry="6.500" fill="#6C4AB6" fill-opacity=".28" stroke="none"/>
+  <ellipse cx="146" cy="120" rx="10" ry="6.500" fill="#6C4AB6" fill-opacity=".28" stroke="none"/>
+  <!-- snout and wide smile -->
+  <ellipse cx="100" cy="124" rx="27" ry="17"/>
+  <ellipse cx="91" cy="124" rx="3.500" ry="5.500" fill="#6C4AB6" stroke="none"/>
+  <ellipse cx="109" cy="124" rx="3.500" ry="5.500" fill="#6C4AB6" stroke="none"/>
+  <path d="M72 148 Q100 172 128 148" stroke-width="5.500"/>
+</svg>

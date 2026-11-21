@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="#6C4AB6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <title>Прасе — опција 3</title>
+  <!-- round head with pointed upright ears, one continuous outline -->
+  <path d="M83.5 42.1 A70 70 0 0 1 116.5 42.1 L148 20 L150.5 63.2 A70 70 0 1 1 49.5 63.2 L52 20 Z"/>
+  <!-- small snout -->
+  <ellipse cx="100" cy="146" rx="21" ry="15"/>
+  <circle cx="92" cy="146" r="3.5" fill="#6C4AB6" stroke="none"/>
+  <circle cx="108" cy="146" r="3.5" fill="#6C4AB6" stroke="none"/>
+  <!-- large eyes with check marks -->
+  <circle cx="75" cy="100" r="22" fill="#6C4AB6" stroke="none"/>
+  <circle cx="125" cy="100" r="22" fill="#6C4AB6" stroke="none"/>
+  <path d="M64 100 l8 8 l15 -16" stroke="#fff" stroke-width="6"/>
+  <path d="M114 100 l8 8 l15 -16" stroke="#fff" stroke-width="6"/>
+</svg>

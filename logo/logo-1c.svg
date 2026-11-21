@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke="#6C4AB6" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+  <title>Прасе — опција 1В (цвет)</title>
+  <!-- slightly wider head with rounded ears -->
+  <path d="M75.4 48 A72 66 0 0 1 124.6 48 C130 26 152 16 163 27 C172 38 168 58 159 72.1 A72 66 0 1 1 41 72.1 C32 58 28 38 37 27 C48 16 70 26 75.4 48 Z"/>
+  <!-- flower -->
+  <g stroke-width="4.500">
+    <circle cx="100" cy="11.500" r="6"/>
+    <circle cx="109" cy="18" r="6"/>
+    <circle cx="105.500" cy="28.500" r="6"/>
+    <circle cx="94.500" cy="28.500" r="6"/>
+    <circle cx="91" cy="18" r="6"/>
+  </g>
+  <circle cx="100" cy="21" r="5.500" fill="#6C4AB6" stroke="none"/>
+  <!-- eyes with check marks and lashes -->
+  <circle cx="70" cy="90" r="16" fill="#6C4AB6" stroke="none"/>
+  <circle cx="130" cy="90" r="16" fill="#6C4AB6" stroke="none"/>
+  <path d="M62.500 90 l5.500 5.500 l10.500 -11.500 M122.500 90 l5.500 5.500 l10.500 -11.500" stroke="#fff" stroke-width="4.800"/>
+  <path d="M54 80 l-5 -3.5 M59 74 l-3 -5 M146 80 l5 -3.5 M141 74 l3 -5" stroke-width="4"/>
+  <!-- heart-shaped snout and smile -->
+  <path d="M100 148 C76 136 70 120 80 113 C88 108 97 112 100 119 C103 112 112 108 120 113 C130 120 124 136 100 148 Z"/>
+  <ellipse cx="91" cy="125" rx="3" ry="4.500" fill="#6C4AB6" stroke="none"/>
+  <ellipse cx="109" cy="125" rx="3" ry="4.500" fill="#6C4AB6" stroke="none"/>
+  <path d="M84 160 Q100 171 116 160" stroke-width="5.500"/>
+</svg>
