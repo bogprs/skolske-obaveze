@@ -330,13 +330,13 @@ const views = {
   },
   week(){
     const t = todayIso(), mon = mondayOf(t), w = ensureWeek(mon);
-    if (!openDays.size) openDays.add('v' + dowOf(t));
-    return subHead('Недељни план') + `<p class="hint">Недеља од ${parse(mon).getDate()}. ${MONTHS[parse(mon).getMonth()]}а</p>` +
+    if (!openDays.size) ORDER.forEach(k => openDays.add('v' + k));
+    return subHead('Недељни план') + `<p class="hint">Недеља од ${parse(mon).getDate()}. ${MONTHS[parse(mon).getMonth()]}а · само преглед</p>` +
       ORDER.map((k, idx) => {
         const d = addDays(mon, idx), items = w.d[k] || [], done = items.filter(x => x.done).length;
         return `<details class="day${d === t ? ' today' : ''}" data-key="v${k}" ${openDays.has('v' + k) ? 'open' : ''}>
           <summary><span class="n">${DAYS[k]}${d === t ? ' · данас' : ''}</span><span class="c">${items.length ? done + '/' + items.length : '—'}</span></summary>
-          <div class="body">${items.length ? items.map((it, i) => rowHtml('w', d, i, it, canEdit(d))).join('') : '<div class="empty">Нема задатака</div>'}</div></details>`;
+          <div class="body">${items.length ? items.map(it => `<div class="row" role="checkbox" aria-disabled="true" aria-checked="${!!it.done}"><span class="t"><b>${esc(it.subject || 'Предмет')}</b>${it.text ? `<small>${esc(it.text)}</small>` : ''}</span><span class="box" aria-hidden="true">✓</span></div>`).join('') : '<div class="empty">Нема задатака</div>'}</div></details>`;
       }).join('');
   },
   cal(){
