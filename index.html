@@ -183,7 +183,7 @@ function defaults(){
   const weeklyT = {};
   for (const k of ORDER) weeklyT[k] = [w('Српски', 'граматика'), w('Математика', 'задаци')];
   return {
-    v: 1, tv: 4, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
+    v: 1, tv: 5, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
     dailyT: ['Вежбице', 'Домаћи', 'Паковање торбе', 'Учење', 'Соба сређивање 25 мин', 'Матиш', 'Енглески', 'Фолклор', 'Суђе', 'Веш', 'Рециклажа'].map(d),
     weeklyT, days: {}, weeks: {}
   };
@@ -193,7 +193,7 @@ const OLD_DAILY = 'Намести кревет|Опери зубе ујутру 
 const OLD_WEEKLY = 'Математика:домаћи задатак,Српски језик:читање|Енглески језик:нове речи,Свет око нас:|Математика:вежбање,Музичка култура:|Српски језик:писање,Енглески језик:|Математика:понављање,Ликовна култура:||';
 function migrate(){
   const tv = S.tv || 1;
-  if (tv >= 4) return;
+  if (tv >= 5) return;
   if (tv < 2) {
     const fresh = defaults(), cur = mondayOf(todayIso());
     if (S.dailyT.map(x => x.text).join('|') === OLD_DAILY) S.dailyT = fresh.dailyT;
@@ -218,7 +218,8 @@ function migrate(){
     for (const mon of Object.keys(S.weeks)) if (mon >= curMon) (S.weeks[mon].d[k] || []).forEach(lower);
   }
   syncTodayDaily();
-  S.tv = 4; save();
+  if (tv < 5) for (const x of S.days[todayIso()].daily) if (x.tri && x.done === false) x.done = 2;   // special entries start orange
+  S.tv = 5; save();
 }
 let S;
 function load(){
@@ -229,7 +230,7 @@ function load(){
 function save(){ try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e) { toast('Чување није успело'); } }
 
 function ensureDay(d){
-  if (!S.days[d]) S.days[d] = { daily: S.dailyT.map(t => ({id: t.id, text: t.text, tri: !!t.tri, done: false})) };
+  if (!S.days[d]) S.days[d] = { daily: S.dailyT.map(t => ({id: t.id, text: t.text, tri: !!t.tri, done: t.tri ? 2 : false})) };
   return S.days[d];
 }
 function ensureWeek(mon){
@@ -249,14 +250,15 @@ function applyTemplate(mon){
 }
 function syncTodayDaily(){
   const rec = ensureDay(todayIso()), old = rec.daily;
-  rec.daily = S.dailyT.map(t => { const o = old.find(x => x.id === t.id); return {id: t.id, text: t.text, tri: !!t.tri, done: o ? (o.done === 2 && !t.tri ? true : o.done) : false}; });
+  rec.daily = S.dailyT.map(t => { const o = old.find(x => x.id === t.id); return {id: t.id, text: t.text, tri: !!t.tri, done: o ? (o.done === 2 && !t.tri ? true : o.done) : (t.tri ? 2 : false)}; });
 }
+const count = items => ({ total: items.filter(x => x.done !== 2).length, done: items.filter(x => x.done === true).length });
 function weekItems(d){ const w = S.weeks[mondayOf(d)]; return w ? (w.d[dowOf(d)] || []) : null; }
 function stats(d){
   const rec = S.days[d], wi = weekItems(d);
   if (!rec && !wi) return null;
   const all = [...(rec ? rec.daily : []), ...(wi || [])];
-  return { total: all.length, done: all.filter(x => x.done).length };
+  return count(all);
 }
 function rollover(){
   const t = todayIso();
@@ -326,8 +328,8 @@ function listHtml(kind, d, items, editable, emptyMsg){
 }
 function progressHtml(items){
   if (!items || !items.length) return '';
-  const done = items.filter(x => x.done).length, pct = Math.round(done / items.length * 100);
-  return `<div class="progress"><div class="txt"><span>Урађено</span><span>${done} од ${items.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+  const c = count(items), done = c.done, pct = c.total ? Math.round(done / c.total * 100) : 100;
+  return `<div class="progress"><div class="txt"><span>Урађено</span><span>${done} од ${c.total}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
 }
 const canEdit = d => d === todayIso() || unlocked;
 const subHead = (title, back) => `<div class="sub"><button class="iconbtn" data-a="go" data-v="${back || 'home'}" aria-label="Назад">←</button><h2>${title}</h2></div>`;
@@ -347,7 +349,7 @@ const views = {
   home(){
     const t = todayIso(), rec = ensureDay(t), wi = ensureWeek(mondayOf(t)).d[dowOf(t)];
     const items = homeTab === 'daily' ? rec.daily : wi;
-    const allDone = items.length && items.every(x => x.done);
+    const allDone = items.length && items.every(x => x.done) && items.some(x => x.done === true);
     return `<header class="top"><div class="hello"><h1>Данас је ${DAYS[dowOf(t)]}!</h1><p>Добродошла${S.name ? ', ' + esc(S.name) : ''} 👋</p></div>
       <button class="iconbtn" data-a="menuOpen" aria-label="Мени">${MENU_SVG}</button></header>
       ${bannersHtml()}
@@ -408,7 +410,7 @@ const views = {
   tpl(){
     let body;
     if (tplTab === 'daily') {
-      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас. Дугме ◐ укључује три стања за обавезу: наранџасто, зелено, празно.</p><div class="card">` +
+      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас. Дугме ◐ укључује три стања за обавезу: наранџасто (не рачуна се), зелено (урађено), празно (није урађено). Такве обавезе почињу дан наранџасте.</p><div class="card">` +
         S.dailyT.map((it, i) => `<div class="erow"><div class="f"><input type="text" value="${esc(it.text)}" data-c="dText" data-i="${i}" aria-label="Обавеза ${i+1}"></div>
           <button class="mini" data-a="dTri" data-i="${i}" aria-pressed="${!!it.tri}" aria-label="Три стања">◐</button><button class="mini" data-a="dMove" data-i="${i}" data-n="-1" aria-label="Горе">▲</button><button class="mini" data-a="dMove" data-i="${i}" data-n="1" aria-label="Доле">▼</button>
           <button class="mini del" data-a="dDel" data-i="${i}" aria-label="Обриши">✕</button></div>`).join('') +
