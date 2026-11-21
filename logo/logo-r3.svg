@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <title>Прасе — обрнуто 3 (силуета, само линије)</title>
+  <path d="M76.7 44.1 A68 68 0 0 1 123.3 44.1 C128 24 150 14 162 24 C172 34 166 54 155.7 69 A68 68 0 1 1 44.3 69 C34 54 28 34 38 24 C50 14 72 24 76.7 44.1 Z" fill="#6C4AB6" stroke="#6C4AB6" stroke-width="7"/>
+  <path d="M100 21 C91 8 78 9 78 21 C78 33 91 34 100 21 Z" fill="#6C4AB6" stroke="#6C4AB6" stroke-width="5"/><path d="M100 21 C109 8 122 9 122 21 C122 33 109 34 100 21 Z" fill="#6C4AB6" stroke="#6C4AB6" stroke-width="5"/>
+  <path d="M100 21 C93 12 83 13 83 21 C83 29 93 30 100 21 Z M100 21 C107 12 117 13 117 21 C117 29 107 30 100 21 Z" stroke="#fff" stroke-width="3"/>
+  <circle cx="70" cy="86" r="15" stroke="#fff" stroke-width="5"/><circle cx="130" cy="86" r="15" stroke="#fff" stroke-width="5"/>
+  <path d="M62.5 86 l5.5 5.5 l10.5 -11.5 M122.5 86 l5.5 5.5 l10.5 -11.5" stroke="#fff" stroke-width="4.8"/>
+  <path d="M54 76 l-5 -3.5 M59 70 l-3 -5 M146 76 l5 -3.5 M141 70 l3 -5" stroke="#fff" stroke-width="4"/>
+  <ellipse cx="100" cy="128" rx="29" ry="18" stroke="#fff" stroke-width="6"/>
+  <ellipse cx="90" cy="128" rx="3.5" ry="5.5" fill="#fff"/>
+  <ellipse cx="110" cy="128" rx="3.5" ry="5.5" fill="#fff"/>
+  <path d="M86 156 Q100 168 114 156" stroke="#fff" stroke-width="5.5"/>
+</svg>

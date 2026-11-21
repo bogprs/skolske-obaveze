@@ -1,5 +1,5 @@
 // Service worker: offline app shell + notification click handling.
-const CACHE = 'obaveze-v2';
+const CACHE = 'obaveze-v3';
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icons/logo.svg', 'icons/icon-192.png', 'icons/icon-512.png'];
 
 self.addEventListener('install', e => {
