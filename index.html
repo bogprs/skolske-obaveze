@@ -13,13 +13,13 @@
 :root{
   --bg:#FBF7F0; --card:#FFFFFF; --ink:#2B2A33; --muted:#6E6B7B; --line:#E9E3D8;
   --accent:#6C4AB6; --accent-soft:#EDE6FA; --on-accent:#FFFFFF;
-  --ok:#2E9E6B; --ok-soft:#DDF3E8; --warn:#C98A00; --warn-soft:#FFF1CC; --bad:#D9655B; --bad-soft:#FBE3E0;
+  --ok:#2E9E6B; --ok-soft:#DDF3E8; --warn:#C98A00; --warn-soft:#FFF1CC; --orange:#EE7F1B; --bad:#D9655B; --bad-soft:#FBE3E0;
 }
 @media (prefers-color-scheme: dark){
   :root{
     --bg:#1B1A22; --card:#26252F; --ink:#EEEAF5; --muted:#A5A1B5; --line:#383645;
     --accent:#A68BEB; --accent-soft:#35304A; --on-accent:#1B1A22;
-    --ok:#5CC796; --ok-soft:#1F3A2E; --warn:#E8B93C; --warn-soft:#3E3418; --bad:#EE8A80; --bad-soft:#43262A;
+    --ok:#5CC796; --ok-soft:#1F3A2E; --warn:#E8B93C; --warn-soft:#3E3418; --orange:#F5923A; --bad:#EE8A80; --bad-soft:#43262A;
   }
 }
 *{box-sizing:border-box}
@@ -55,7 +55,10 @@ header.top p{margin:4px 0 0;color:var(--muted);font-size:17px}
 .row[aria-checked="true"] .box{background:var(--ok);border-color:var(--ok);color:#fff}
 .row[aria-checked="true"] .t{color:var(--muted);text-decoration:line-through}
 .row[aria-checked="true"] .t small{text-decoration:line-through}
+.row[aria-checked="mixed"] .box{background:var(--orange);border-color:var(--orange);color:#fff}
+.row[aria-checked="mixed"] .t{color:var(--muted);text-decoration:line-through}
 .row.locked .box{opacity:.55}
+.mini[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#fff}
 .empty{padding:22px 16px;color:var(--muted);text-align:center}
 .bravo{padding:14px 16px;border-radius:16px;background:var(--ok-soft);color:var(--ink);font-weight:600;text-align:center;margin-bottom:14px}
 
@@ -173,13 +176,14 @@ const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2400); }
 
 /* ---------- state ---------- */
+const TRI_NAMES = ['Матиш', 'Енглески', 'Фолклор'];
 function defaults(){
-  const d = t => ({id: uid(), text: t});
+  const d = t => TRI_NAMES.includes(t) ? {id: uid(), text: t, tri: true} : {id: uid(), text: t};
   const w = (s, t) => ({id: uid(), subject: s, text: t || ''});
   const weeklyT = {};
-  for (const k of ORDER) weeklyT[k] = [w('Српски', 'граматика'), w('Математика', 'Задаци')];
+  for (const k of ORDER) weeklyT[k] = [w('Српски', 'граматика'), w('Математика', 'задаци')];
   return {
-    v: 1, tv: 3, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
+    v: 1, tv: 4, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
     dailyT: ['Вежбице', 'Домаћи', 'Паковање торбе', 'Учење', 'Соба сређивање 25 мин', 'Матиш', 'Енглески', 'Фолклор', 'Суђе', 'Веш', 'Рециклажа'].map(d),
     weeklyT, days: {}, weeks: {}
   };
@@ -188,24 +192,33 @@ function defaults(){
 const OLD_DAILY = 'Намести кревет|Опери зубе ујутру и увече|Спакуј торбу за сутра|Читање 15 минута|Среди радни сто';
 const OLD_WEEKLY = 'Математика:домаћи задатак,Српски језик:читање|Енглески језик:нове речи,Свет око нас:|Математика:вежбање,Музичка култура:|Српски језик:писање,Енглески језик:|Математика:понављање,Ликовна култура:||';
 function migrate(){
-  if (S.tv >= 3) return;
-  if (S.tv === 2) {
+  const tv = S.tv || 1;
+  if (tv >= 4) return;
+  if (tv < 2) {
+    const fresh = defaults(), cur = mondayOf(todayIso());
+    if (S.dailyT.map(x => x.text).join('|') === OLD_DAILY) S.dailyT = fresh.dailyT;
+    if (ORDER.map(k => S.weeklyT[k].map(x => x.subject + ':' + x.text).join(',')).join('|') === OLD_WEEKLY) {
+      S.weeklyT = fresh.weeklyT;
+      for (const mon of Object.keys(S.weeks)) if (mon >= cur && !S.weeks[mon].prepared && !ORDER.some(k => S.weeks[mon].d[k].some(x => x.done))) delete S.weeks[mon];
+      ensureWeek(cur);
+    }
+  }
+  if (tv === 2) {
     const NEW = 'Соба сређивање 25 мин';
     if (!S.dailyT.some(x => x.text === NEW)) {
       const i = S.dailyT.findIndex(x => x.text === 'Учење');
       S.dailyT.splice(i < 0 ? S.dailyT.length : i + 1, 0, {id: uid(), text: NEW});
-      syncTodayDaily();
     }
-    S.tv = 3; save(); return;
   }
-  const fresh = defaults(), cur = mondayOf(todayIso());
-  if (S.dailyT.map(x => x.text).join('|') === OLD_DAILY) { S.dailyT = fresh.dailyT; syncTodayDaily(); }
-  if (ORDER.map(k => S.weeklyT[k].map(x => x.subject + ':' + x.text).join(',')).join('|') === OLD_WEEKLY) {
-    S.weeklyT = fresh.weeklyT;
-    for (const mon of Object.keys(S.weeks)) if (mon >= cur && !S.weeks[mon].prepared && !ORDER.some(k => S.weeks[mon].d[k].some(x => x.done))) delete S.weeks[mon];
-    ensureWeek(cur);
+  for (const t of S.dailyT) if (TRI_NAMES.includes(t.text)) t.tri = true;   // three-state entries
+  const lower = x => { if (x.subject === 'Математика' && x.text === 'Задаци') x.text = 'задаци'; };
+  const curMon = mondayOf(todayIso());
+  for (const k of ORDER) {
+    S.weeklyT[k].forEach(lower);
+    for (const mon of Object.keys(S.weeks)) if (mon >= curMon) (S.weeks[mon].d[k] || []).forEach(lower);
   }
-  S.tv = 3; save();
+  syncTodayDaily();
+  S.tv = 4; save();
 }
 let S;
 function load(){
@@ -216,7 +229,7 @@ function load(){
 function save(){ try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e) { toast('Чување није успело'); } }
 
 function ensureDay(d){
-  if (!S.days[d]) S.days[d] = { daily: S.dailyT.map(t => ({id: t.id, text: t.text, done: false})) };
+  if (!S.days[d]) S.days[d] = { daily: S.dailyT.map(t => ({id: t.id, text: t.text, tri: !!t.tri, done: false})) };
   return S.days[d];
 }
 function ensureWeek(mon){
@@ -236,7 +249,7 @@ function applyTemplate(mon){
 }
 function syncTodayDaily(){
   const rec = ensureDay(todayIso()), old = rec.daily;
-  rec.daily = S.dailyT.map(t => ({id: t.id, text: t.text, done: !!(old.find(o => o.id === t.id) || {}).done}));
+  rec.daily = S.dailyT.map(t => { const o = old.find(x => x.id === t.id); return {id: t.id, text: t.text, tri: !!t.tri, done: o ? (o.done === 2 && !t.tri ? true : o.done) : false}; });
 }
 function weekItems(d){ const w = S.weeks[mondayOf(d)]; return w ? (w.d[dowOf(d)] || []) : null; }
 function stats(d){
@@ -304,7 +317,7 @@ function rowHtml(kind, d, i, it, editable){
   const label = kind === 'w'
     ? `<b>${esc(it.subject || 'Предмет')}</b>${it.text ? `<small>${esc(it.text)}</small>` : ''}`
     : esc(it.text);
-  return `<button class="row${editable ? '' : ' locked'}" role="checkbox" aria-checked="${!!it.done}" data-a="tick" data-k="${kind}" data-d="${d}" data-i="${i}">
+  return `<button class="row${editable ? '' : ' locked'}" role="checkbox" aria-checked="${it.done === 2 ? 'mixed' : !!it.done}" data-a="tick" data-k="${kind}" data-d="${d}" data-i="${i}">
     <span class="t">${label}</span><span class="box" aria-hidden="true">✓</span></button>`;
 }
 function listHtml(kind, d, items, editable, emptyMsg){
@@ -395,9 +408,9 @@ const views = {
   tpl(){
     let body;
     if (tplTab === 'daily') {
-      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас.</p><div class="card">` +
+      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас. Дугме ◐ укључује три стања за обавезу: зелено, наранџасто, празно.</p><div class="card">` +
         S.dailyT.map((it, i) => `<div class="erow"><div class="f"><input type="text" value="${esc(it.text)}" data-c="dText" data-i="${i}" aria-label="Обавеза ${i+1}"></div>
-          <button class="mini" data-a="dMove" data-i="${i}" data-n="-1" aria-label="Горе">▲</button><button class="mini" data-a="dMove" data-i="${i}" data-n="1" aria-label="Доле">▼</button>
+          <button class="mini" data-a="dTri" data-i="${i}" aria-pressed="${!!it.tri}" aria-label="Три стања">◐</button><button class="mini" data-a="dMove" data-i="${i}" data-n="-1" aria-label="Горе">▲</button><button class="mini" data-a="dMove" data-i="${i}" data-n="1" aria-label="Доле">▼</button>
           <button class="mini del" data-a="dDel" data-i="${i}" aria-label="Обриши">✕</button></div>`).join('') +
         `<form class="addrow" data-f="dAdd"><input type="text" id="dNew" placeholder="Нова обавеза" maxlength="80" autocomplete="off"><button class="btn">Додај</button></form></div>`;
     } else {
@@ -472,7 +485,9 @@ const A = {
     const doIt = () => {
       const list = ds.k === 'd' ? (S.days[d] || {}).daily : weekItems(d);
       if (!list || !list[i]) return;
-      list[i].done = !list[i].done; save(); render(true);
+      const it = list[i];
+      it.done = it.tri ? (it.done === true ? 2 : it.done === 2 ? false : true) : !it.done;
+      save(); render(true);
     };
     canEdit(d) ? doIt() : requirePin(() => { render(true); doIt(); });
   },
@@ -482,6 +497,7 @@ const A = {
   day(ds){ dayView = ds.d; view = 'day'; render(); },
   tplTab(ds){ tplTab = ds.t; render(); },
   scope(ds){ wkScope = ds.s; save(); render(true); },
+  dTri(ds){ const t = S.dailyT[+ds.i]; t.tri = !t.tri; syncTodayDaily(); save(); render(true); },
   dMove(ds){ const i = +ds.i, j = i + (+ds.n); if (j < 0 || j >= S.dailyT.length) return; [S.dailyT[i], S.dailyT[j]] = [S.dailyT[j], S.dailyT[i]]; syncTodayDaily(); save(); render(true); },
   dDel(ds){ if (!confirm('Обрисати ову обавезу из шаблона?')) return; S.dailyT.splice(+ds.i, 1); syncTodayDaily(); save(); render(true); },
   wAdd(ds){ wkList(wkScope, ds.k).push({id: uid(), subject: '', text: '', done: false}); save(); render(true);
