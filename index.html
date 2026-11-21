@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="sr-Cyrl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Моје обавезе</title>
+<meta name="theme-color" content="#6C4AB6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<style>
+:root{
+  --bg:#FBF7F0; --card:#FFFFFF; --ink:#2B2A33; --muted:#6E6B7B; --line:#E9E3D8;
+  --accent:#6C4AB6; --accent-soft:#EDE6FA; --on-accent:#FFFFFF;
+  --ok:#2E9E6B; --ok-soft:#DDF3E8; --warn:#C98A00; --warn-soft:#FFF1CC; --bad:#D9655B; --bad-soft:#FBE3E0;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#1B1A22; --card:#26252F; --ink:#EEEAF5; --muted:#A5A1B5; --line:#383645;
+    --accent:#A68BEB; --accent-soft:#35304A; --on-accent:#1B1A22;
+    --ok:#5CC796; --ok-soft:#1F3A2E; --warn:#E8B93C; --warn-soft:#3E3418; --bad:#EE8A80; --bad-soft:#43262A;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--ink);font:17px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif;-webkit-tap-highlight-color:transparent}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+#app{max-width:560px;margin:0 auto;padding:0 16px calc(24px + env(safe-area-inset-bottom));min-height:100%}
+
+header.top{display:flex;align-items:flex-start;gap:12px;padding:calc(18px + env(safe-area-inset-top)) 0 14px}
+header.top .hello{flex:1;min-width:0}
+header.top h1{margin:0;font-size:25px;line-height:1.2;text-wrap:balance}
+header.top p{margin:4px 0 0;color:var(--muted);font-size:17px}
+.iconbtn{flex:none;width:48px;height:48px;border-radius:14px;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-size:22px}
+.iconbtn svg{width:24px;height:24px}
+
+.tabs{display:flex;gap:10px;margin-bottom:14px}
+.tabs button{flex:1;min-height:52px;padding:8px 10px;border-radius:16px;border:2px solid var(--line);background:var(--card);font-weight:600;line-height:1.2}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+.progress{margin:0 2px 14px}
+.progress .bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.progress .bar i{display:block;height:100%;background:var(--ok);border-radius:99px;transition:width .3s}
+.progress .txt{display:flex;justify-content:space-between;font-size:15px;color:var(--muted);margin-bottom:6px}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-bottom:14px}
+.row{display:flex;align-items:center;gap:12px;width:100%;min-height:60px;padding:10px 12px 10px 16px;background:none;border:0;border-bottom:1px solid var(--line);text-align:left}
+.row:last-child{border-bottom:0}
+.row .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.row .t b{display:block}
+.row .t small{color:var(--muted);font-size:15px}
+.row .box{flex:none;width:34px;height:34px;border-radius:10px;border:2.5px solid var(--muted);display:grid;place-items:center;color:transparent;font-size:22px;font-weight:700;transition:.15s}
+.row[aria-checked="true"] .box{background:var(--ok);border-color:var(--ok);color:#fff}
+.row[aria-checked="true"] .t{color:var(--muted);text-decoration:line-through}
+.row[aria-checked="true"] .t small{text-decoration:line-through}
+.row.locked .box{opacity:.55}
+.empty{padding:22px 16px;color:var(--muted);text-align:center}
+.bravo{padding:14px 16px;border-radius:16px;background:var(--ok-soft);color:var(--ink);font-weight:600;text-align:center;margin-bottom:14px}
+
+.banner{display:flex;gap:10px;align-items:center;padding:12px 14px;border-radius:16px;background:var(--warn-soft);margin-bottom:12px;font-size:16px}
+.banner span{flex:1}
+.banner button{border:0;background:none;font-weight:700;color:var(--accent);padding:8px;min-height:40px}
+
+h2{font-size:20px;margin:6px 0 12px}
+h3{font-size:16px;margin:18px 4px 8px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.sub{display:flex;align-items:center;gap:10px;padding:calc(14px + env(safe-area-inset-top)) 0 10px}
+.sub h2{flex:1;margin:0}
+.hint{color:var(--muted);font-size:15px;margin:0 4px 12px}
+
+details.day{background:var(--card);border:1px solid var(--line);border-radius:18px;margin-bottom:10px;overflow:hidden}
+details.day>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:14px 16px;font-weight:600;min-height:54px;cursor:pointer}
+details.day>summary::-webkit-details-marker{display:none}
+details.day>summary::after{content:"▾";color:var(--muted);transition:transform .2s}
+details.day[open]>summary::after{transform:rotate(180deg)}
+details.day>summary .n{flex:1;text-transform:capitalize}
+details.day>summary .c{font-weight:500;color:var(--muted);font-size:15px}
+details.day.today>summary .n{color:var(--accent)}
+details.day .body{border-top:1px solid var(--line)}
+
+.cal-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.cal-head b{flex:1;text-align:center;text-transform:capitalize;font-size:18px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal .dow{text-align:center;font-size:13px;color:var(--muted);padding:4px 0}
+.cal button{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:600;padding:0}
+.cal button.full{background:var(--ok-soft);border-color:var(--ok)}
+.cal button.part{background:var(--warn-soft);border-color:var(--warn)}
+.cal button.none{background:var(--bad-soft);border-color:var(--bad)}
+.cal button.fut{color:var(--muted);font-weight:400}
+.cal button.now{outline:3px solid var(--accent);outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin:14px 4px;font-size:14px;color:var(--muted)}
+.legend i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:6px;vertical-align:-2px;border:1px solid}
+.legend .full{background:var(--ok-soft);border-color:var(--ok)}
+.legend .part{background:var(--warn-soft);border-color:var(--warn)}
+.legend .none{background:var(--bad-soft);border-color:var(--bad)}
+
+.seg{display:flex;background:var(--line);border-radius:14px;padding:4px;margin-bottom:12px}
+.seg button{flex:1;border:0;background:none;border-radius:11px;min-height:42px;font-size:15px;font-weight:600;padding:4px}
+.seg button[aria-selected="true"]{background:var(--card)}
+.erow{display:flex;gap:6px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+.erow .f{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+input[type=text],input[type=password],input[type=tel]{width:100%;min-height:46px;padding:8px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg)}
+input:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.mini{flex:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--bg)}
+.mini.del{color:var(--bad)}
+.addrow{display:flex;gap:8px;padding:10px}
+.btn{min-height:48px;padding:10px 16px;border-radius:14px;border:0;background:var(--accent);color:var(--on-accent);font-weight:600}
+.btn.ghost{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+.btn.wide{width:100%;margin-bottom:10px}
+.btn.danger{background:var(--card);color:var(--bad);border:1.5px solid var(--bad)}
+.set{padding:14px 16px;border-bottom:1px solid var(--line)}
+.set:last-child{border-bottom:0}
+.set label{display:block;font-weight:600;margin-bottom:8px}
+.set p{margin:0 0 10px;color:var(--muted);font-size:15px}
+
+#scrim{position:fixed;inset:0;background:#0007;opacity:0;pointer-events:none;transition:opacity .2s;z-index:10}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:min(82vw,320px);background:var(--card);transform:translateX(105%);transition:transform .22s;z-index:11;padding:calc(18px + env(safe-area-inset-top)) 12px 18px;display:flex;flex-direction:column;gap:4px;box-shadow:-8px 0 30px #0003}
+body.menu #scrim{opacity:1;pointer-events:auto}
+body.menu #drawer{transform:none}
+#drawer button{display:flex;align-items:center;gap:14px;min-height:54px;padding:8px 14px;border:0;background:none;border-radius:14px;text-align:left;font-weight:600;width:100%}
+#drawer button:active{background:var(--accent-soft)}
+#drawer button span{width:26px;text-align:center;font-size:20px}
+#drawer .ttl{font-size:14px;color:var(--muted);padding:4px 14px 10px;text-transform:uppercase;letter-spacing:.05em}
+
+dialog{border:0;border-radius:20px;background:var(--card);color:var(--ink);padding:20px;width:min(92vw,380px)}
+dialog::backdrop{background:#0008}
+dialog h2{margin-top:0}
+dialog p{color:var(--muted);margin:0 0 12px}
+dialog .err{color:var(--bad);min-height:1.4em;font-size:15px;margin:6px 0}
+dialog .acts{display:flex;gap:10px;justify-content:flex-end;margin-top:8px}
+dialog input{margin-bottom:8px}
+#toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-size:15px;opacity:0;transition:.25s;pointer-events:none;z-index:30;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="scrim" data-a="menuClose"></div>
+<nav id="drawer" aria-label="Мени">
+  <div class="ttl">Мени</div>
+  <button data-a="go" data-v="home"><span>🏠</span>Почетна</button>
+  <button data-a="go" data-v="week"><span>📚</span>Недељни план</button>
+  <button data-a="go" data-v="cal"><span>📅</span>Календар</button>
+  <button data-a="go" data-v="tpl"><span>✏️</span>Измени шаблоне</button>
+  <button data-a="go" data-v="set"><span>⚙️</span>Подешавања</button>
+</nav>
+<dialog id="dlg"></dialog>
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+const LS = 'duki-obaveze-v1';
+const DAYS = ['недеља','понедељак','уторак','среда','четвртак','петак','субота'];
+const DAYS_SHORT = ['нед','пон','уто','сре','чет','пет','суб'];
+const ORDER = [1,2,3,4,5,6,0];
+const MONTHS = ['јануар','фебруар','март','април','мај','јун','јул','август','септембар','октобар','новембар','децембар'];
+const DAILY_HOUR = 20, WEEKLY_HOUR = 19;
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const iso = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d, 12); };
+const addDays = (s, n) => { const d = parse(s); d.setDate(d.getDate()+n); return iso(d); };
+const dowOf = s => parse(s).getDay();
+const mondayOf = s => addDays(s, -((dowOf(s)+6)%7));
+const todayIso = () => iso(new Date());
+const longDate = s => { const d = parse(s); return DAYS[d.getDay()] + ', ' + d.getDate() + '. ' + MONTHS[d.getMonth()] + ' ' + d.getFullYear() + '.'; };
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('on'), 2400); }
+
+/* ---------- state ---------- */
+function defaults(){
+  const d = t => ({id: uid(), text: t});
+  const w = (s, t) => ({id: uid(), subject: s, text: t || ''});
+  return {
+    v: 1, name: '', pin: null, notif: false, lastOpen: '', remD: '', remW: '',
+    dailyT: [d('Намести кревет'), d('Опери зубе ујутру и увече'), d('Спакуј торбу за сутра'), d('Читање 15 минута'), d('Среди радни сто')],
+    weeklyT: {
+      1: [w('Математика', 'домаћи задатак'), w('Српски језик', 'читање')],
+      2: [w('Енглески језик', 'нове речи'), w('Свет око нас')],
+      3: [w('Математика', 'вежбање'), w('Музичка култура')],
+      4: [w('Српски језик', 'писање'), w('Енглески језик')],
+      5: [w('Математика', 'понављање'), w('Ликовна култура')],
+      6: [], 0: []
+    },
+    days: {}, weeks: {}
+  };
+}
+let S;
+function load(){
+  try { S = JSON.parse(localStorage.getItem(LS)); } catch(e) { S = null; }
+  if (!S || S.v !== 1) S = defaults();
+  for (const k of ORDER) S.weeklyT[k] = S.weeklyT[k] || [];
+}
+function save(){ try { localStorage.setItem(LS, JSON.stringify(S)); } catch(e) { toast('Чување није успело'); } }
+
+function ensureDay(d){
+  if (!S.days[d]) S.days[d] = { daily: S.dailyT.map(t => ({id: t.id, text: t.text, done: false})) };
+  return S.days[d];
+}
+function ensureWeek(mon){
+  if (!S.weeks[mon]) {
+    const w = { prepared: false, d: {} };
+    for (const k of ORDER) w.d[k] = S.weeklyT[k].map(t => ({id: t.id, subject: t.subject, text: t.text, done: false}));
+    S.weeks[mon] = w;
+  }
+  return S.weeks[mon];
+}
+function applyTemplate(mon){
+  const w = ensureWeek(mon);
+  for (const k of ORDER) {
+    const old = w.d[k] || [];
+    w.d[k] = S.weeklyT[k].map(t => ({id: t.id, subject: t.subject, text: t.text, done: !!(old.find(o => o.id === t.id) || {}).done}));
+  }
+}
+function syncTodayDaily(){
+  const rec = ensureDay(todayIso()), old = rec.daily;
+  rec.daily = S.dailyT.map(t => ({id: t.id, text: t.text, done: !!(old.find(o => o.id === t.id) || {}).done}));
+}
+function weekItems(d){ const w = S.weeks[mondayOf(d)]; return w ? (w.d[dowOf(d)] || []) : null; }
+function stats(d){
+  const rec = S.days[d], wi = weekItems(d);
+  if (!rec && !wi) return null;
+  const all = [...(rec ? rec.daily : []), ...(wi || [])];
+  return { total: all.length, done: all.filter(x => x.done).length };
+}
+function rollover(){
+  const t = todayIso();
+  if (S.lastOpen && S.lastOpen < t) {
+    let d = addDays(S.lastOpen, 1), n = 0;
+    while (d < t && n++ < 90) { ensureDay(d); ensureWeek(mondayOf(d)); d = addDays(d, 1); }
+  }
+  ensureDay(t); ensureWeek(mondayOf(t));
+  S.lastOpen = t; save();
+}
+
+/* ---------- ui state ---------- */
+let view = 'home', homeTab = 'daily', calMonth = null, dayView = null, tplTab = 'daily', wkScope = 't';
+let unlocked = false, bannerOff = {}, openDays = new Set(), swReg = null, shownDay = '';
+
+/* ---------- pin + dialogs ---------- */
+function dialog(html){ const d = $('#dlg'); d.innerHTML = html; if (!d.open) d.showModal(); return d; }
+function closeDlg(){ const d = $('#dlg'); if (d.open) d.close(); }
+function requirePin(cb){
+  if (unlocked) return cb();
+  if (!S.pin) {
+    const d = dialog(`<form method="dialog"><h2>Постави родитељски PIN</h2><p>PIN од 4 цифре штити шаблоне и измену других дана.</p>
+      <input type="password" inputmode="numeric" maxlength="4" pattern="\\d{4}" id="p1" placeholder="Нови PIN" autocomplete="off">
+      <input type="password" inputmode="numeric" maxlength="4" id="p2" placeholder="Понови PIN" autocomplete="off">
+      <div class="err" id="perr"></div>
+      <div class="acts"><button type="button" class="btn ghost" data-a="dlgClose">Одустани</button><button type="submit" class="btn">Сачувај</button></div></form>`);
+    d.querySelector('form').onsubmit = e => {
+      e.preventDefault();
+      const a = $('#p1').value, b = $('#p2').value;
+      if (!/^\d{4}$/.test(a)) return $('#perr').textContent = 'Унеси тачно 4 цифре.';
+      if (a !== b) return $('#perr').textContent = 'PIN-ови се не поклапају.';
+      S.pin = a; save(); unlocked = true; closeDlg(); cb();
+    };
+    $('#p1').focus();
+    return;
+  }
+  const d = dialog(`<form method="dialog"><h2>Родитељски PIN</h2>
+    <input type="password" inputmode="numeric" maxlength="4" id="p1" placeholder="PIN" autocomplete="off">
+    <div class="err" id="perr"></div>
+    <div class="acts"><button type="button" class="btn ghost" data-a="dlgClose">Одустани</button><button type="submit" class="btn">Откључај</button></div></form>`);
+  d.querySelector('form').onsubmit = e => {
+    e.preventDefault();
+    if ($('#p1').value === S.pin) { unlocked = true; closeDlg(); cb(); }
+    else { $('#perr').textContent = 'Погрешан PIN.'; $('#p1').value = ''; }
+  };
+  $('#p1').focus();
+}
+function askName(first){
+  const d = dialog(`<form method="dialog"><h2>${first ? 'Добродошла!' : 'Име'}</h2><p>Како се зове дете које користи апликацију?</p>
+    <input type="text" id="nm" maxlength="30" value="${esc(S.name)}" placeholder="Име" autocomplete="off">
+    <div class="acts">${first ? '' : '<button type="button" class="btn ghost" data-a="dlgClose">Одустани</button>'}<button type="submit" class="btn">Сачувај</button></div></form>`);
+  d.querySelector('form').onsubmit = e => { e.preventDefault(); S.name = $('#nm').value.trim(); save(); closeDlg(); render(); };
+  $('#nm').focus();
+}
+
+/* ---------- rendering ---------- */
+function rowHtml(kind, d, i, it, editable){
+  const label = kind === 'w'
+    ? `<b>${esc(it.subject || 'Предмет')}</b>${it.text ? `<small>${esc(it.text)}</small>` : ''}`
+    : esc(it.text);
+  return `<button class="row${editable ? '' : ' locked'}" role="checkbox" aria-checked="${!!it.done}" data-a="tick" data-k="${kind}" data-d="${d}" data-i="${i}">
+    <span class="t">${label}</span><span class="box" aria-hidden="true">✓</span></button>`;
+}
+function listHtml(kind, d, items, editable, emptyMsg){
+  if (!items || !items.length) return `<div class="card"><div class="empty">${emptyMsg}</div></div>`;
+  return `<div class="card">${items.map((it, i) => rowHtml(kind, d, i, it, editable)).join('')}</div>`;
+}
+function progressHtml(items){
+  if (!items || !items.length) return '';
+  const done = items.filter(x => x.done).length, pct = Math.round(done / items.length * 100);
+  return `<div class="progress"><div class="txt"><span>Урађено</span><span>${done} од ${items.length}</span></div><div class="bar"><i style="width:${pct}%"></i></div></div>`;
+}
+const canEdit = d => d === todayIso() || unlocked;
+const subHead = (title, back) => `<div class="sub"><button class="iconbtn" data-a="go" data-v="${back || 'home'}" aria-label="Назад">←</button><h2>${title}</h2></div>`;
+const MENU_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>';
+
+function bannersHtml(){
+  const now = new Date(), t = todayIso(), out = [];
+  const st = stats(t);
+  if (now.getHours() >= DAILY_HOUR && st && st.done < st.total && !bannerOff.d)
+    out.push(`<div class="banner"><span>⏰ Још ${st.total - st.done} до краја! Провери да ли је све завршено.</span><button data-a="bannerOff" data-b="d" aria-label="Затвори">✕</button></div>`);
+  if (now.getDay() === 0 && now.getHours() >= WEEKLY_HOUR && !ensureWeek(addDays(mondayOf(t), 7)).prepared && !bannerOff.w)
+    out.push(`<div class="banner"><span>📚 Недеља је — припреми план учења за следећу недељу.</span><button data-a="prepNext">Припреми</button></div>`);
+  return out.join('');
+}
+
+const views = {
+  home(){
+    const t = todayIso(), rec = ensureDay(t), wi = ensureWeek(mondayOf(t)).d[dowOf(t)];
+    const items = homeTab === 'daily' ? rec.daily : wi;
+    const allDone = items.length && items.every(x => x.done);
+    return `<header class="top"><div class="hello"><h1>Данас је ${DAYS[dowOf(t)]}!</h1><p>Добродошла${S.name ? ', ' + esc(S.name) : ''} 👋</p></div>
+      <button class="iconbtn" data-a="menuOpen" aria-label="Мени">${MENU_SVG}</button></header>
+      ${bannersHtml()}
+      <div class="tabs" role="tablist">
+        <button role="tab" aria-selected="${homeTab === 'daily'}" data-a="tab" data-t="daily">Дневне обавезе</button>
+        <button role="tab" aria-selected="${homeTab === 'weekly'}" data-a="tab" data-t="weekly">Учење данас</button>
+      </div>
+      ${progressHtml(items)}
+      ${allDone ? '<div class="bravo">Браво! Све је завршено 🎉</div>' : ''}
+      ${listHtml(homeTab === 'daily' ? 'd' : 'w', t, items, true, homeTab === 'daily' ? 'Нема дневних обавеза. Додај их у шаблону.' : 'Данас нема учења по плану. 🎈')}`;
+  },
+  week(){
+    const t = todayIso(), mon = mondayOf(t), w = ensureWeek(mon);
+    if (!openDays.size) openDays.add('v' + dowOf(t));
+    return subHead('Недељни план') + `<p class="hint">Недеља од ${parse(mon).getDate()}. ${MONTHS[parse(mon).getMonth()]}а</p>` +
+      ORDER.map((k, idx) => {
+        const d = addDays(mon, idx), items = w.d[k] || [], done = items.filter(x => x.done).length;
+        return `<details class="day${d === t ? ' today' : ''}" data-key="v${k}" ${openDays.has('v' + k) ? 'open' : ''}>
+          <summary><span class="n">${DAYS[k]}${d === t ? ' · данас' : ''}</span><span class="c">${items.length ? done + '/' + items.length : '—'}</span></summary>
+          <div class="body">${items.length ? items.map((it, i) => rowHtml('w', d, i, it, canEdit(d))).join('') : '<div class="empty">Нема задатака</div>'}</div></details>`;
+      }).join('');
+  },
+  cal(){
+    const t = todayIso();
+    if (!calMonth) calMonth = t.slice(0, 7);
+    const [y, m] = calMonth.split('-').map(Number);
+    const first = new Date(y, m - 1, 1, 12), nDays = new Date(y, m, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    let cells = ORDER.map(k => `<div class="dow">${DAYS_SHORT[k]}</div>`).join('') + '<div></div>'.repeat(lead);
+    for (let i = 1; i <= nDays; i++) {
+      const d = calMonth + '-' + String(i).padStart(2, '0');
+      let cls = '', lbl = '';
+      if (d > t) { cls = 'fut'; lbl = 'план'; }
+      else { const st = stats(d);
+        if (st && st.total) { cls = st.done === st.total ? 'full' : st.done ? 'part' : 'none'; lbl = st.done + ' од ' + st.total; } }
+      cells += `<button class="${cls}${d === t ? ' now' : ''}" data-a="day" data-d="${d}" aria-label="${i}. ${MONTHS[m-1]}${lbl ? ', ' + lbl : ''}">${i}</button>`;
+    }
+    return subHead('Календар') + `<div class="cal-head"><button class="iconbtn" data-a="calNav" data-n="-1" aria-label="Претходни месец">‹</button>
+      <b>${MONTHS[m-1]} ${y}.</b><button class="iconbtn" data-a="calNav" data-n="1" aria-label="Следећи месец">›</button></div>
+      <div class="cal">${cells}</div>
+      <div class="legend"><span><i class="full"></i>све урађено</span><span><i class="part"></i>делимично</span><span><i class="none"></i>ништа</span></div>`;
+  },
+  day(){
+    const d = dayView, t = todayIso(), fut = d > t;
+    let daily, wi, note = '';
+    if (fut) {
+      daily = S.dailyT.map(x => ({...x, done: false}));
+      wi = (weekItems(d) || S.weeklyT[dowOf(d)]).map(x => ({...x, done: false}));
+      note = '<p class="hint">Ово је план за дан који тек долази.</p>';
+    } else {
+      daily = S.days[d] ? S.days[d].daily : null; wi = weekItems(d);
+      if (d !== t) note = `<p class="hint">${unlocked ? 'Откључано — можеш да исправиш штиклиране обавезе.' : '🔒 За измену овог дана потребан је родитељски PIN.'}</p>`;
+    }
+    const noData = '<div class="card"><div class="empty">Нема података за овај дан.</div></div>';
+    return subHead(cap(longDate(d)), 'cal') + note +
+      '<h3>Дневне обавезе</h3>' + (daily ? progressHtml(fut ? null : daily) + listHtml('d', d, daily, canEdit(d) && !fut, 'Нема обавеза.') : noData) +
+      '<h3>Учење</h3>' + (wi ? progressHtml(fut ? null : wi) + listHtml('w', d, wi, canEdit(d) && !fut, 'Нема учења по плану.') : noData);
+  },
+  tpl(){
+    let body;
+    if (tplTab === 'daily') {
+      body = `<p class="hint">Ове обавезе се појављују сваког дана. Измене важе од данас.</p><div class="card">` +
+        S.dailyT.map((it, i) => `<div class="erow"><div class="f"><input type="text" value="${esc(it.text)}" data-c="dText" data-i="${i}" aria-label="Обавеза ${i+1}"></div>
+          <button class="mini" data-a="dMove" data-i="${i}" data-n="-1" aria-label="Горе">▲</button><button class="mini" data-a="dMove" data-i="${i}" data-n="1" aria-label="Доле">▼</button>
+          <button class="mini del" data-a="dDel" data-i="${i}" aria-label="Обриши">✕</button></div>`).join('') +
+        `<form class="addrow" data-f="dAdd"><input type="text" id="dNew" placeholder="Нова обавеза" maxlength="80" autocomplete="off"><button class="btn">Додај</button></form></div>`;
+    } else {
+      const t = todayIso(), cur = mondayOf(t), nxt = addDays(cur, 7);
+      const subjects = [...new Set(ORDER.flatMap(k => S.weeklyT[k].map(x => x.subject)).filter(Boolean))];
+      const hint = wkScope === 't' ? 'Шаблон се копира у сваку нову недељу.' : wkScope === 'cur' ? 'Измене важе само за ову недељу.' : 'Измене важе само за следећу недељу.';
+      body = `<div class="seg" role="tablist">
+          <button role="tab" aria-selected="${wkScope === 't'}" data-a="scope" data-s="t">Шаблон</button>
+          <button role="tab" aria-selected="${wkScope === 'cur'}" data-a="scope" data-s="cur">Ова недеља</button>
+          <button role="tab" aria-selected="${wkScope === 'next'}" data-a="scope" data-s="next">Следећа</button></div>
+        <p class="hint">${hint}</p><datalist id="subj">${subjects.map(s => `<option value="${esc(s)}">`).join('')}</datalist>` +
+        ORDER.map(k => { const items = wkList(wkScope, k);
+          return `<details class="day" data-key="e${k}" ${openDays.has('e' + k) ? 'open' : ''}><summary><span class="n">${DAYS[k]}</span><span class="c">${items.length || '—'}</span></summary><div class="body">` +
+            items.map((it, i) => `<div class="erow"><div class="f"><input type="text" list="subj" value="${esc(it.subject)}" placeholder="Предмет" data-c="wSubj" data-k="${k}" data-i="${i}" aria-label="Предмет">
+              <input type="text" value="${esc(it.text)}" placeholder="Задатак (није обавезно)" data-c="wText" data-k="${k}" data-i="${i}" aria-label="Задатак"></div>
+              <button class="mini del" data-a="wDel" data-k="${k}" data-i="${i}" aria-label="Обриши">✕</button></div>`).join('') +
+            `<div class="addrow"><button class="btn ghost" style="flex:1" data-a="wAdd" data-k="${k}">＋ Додај предмет</button></div></div></details>`; }).join('') +
+        (wkScope === 't'
+          ? `<button class="btn ghost wide" data-a="applyT" data-m="${cur}">Примени шаблон на ову недељу</button><button class="btn ghost wide" data-a="applyT" data-m="${nxt}">Примени шаблон на следећу недељу</button>`
+          : wkScope === 'next'
+            ? (ensureWeek(nxt).prepared ? '<div class="bravo">План за следећу недељу је потврђен ✓</div>' : `<button class="btn wide" data-a="prepared">Потврди план за следећу недељу</button>`)
+            : '');
+    }
+    return subHead('Шаблони') + `<div class="tabs" role="tablist">
+      <button role="tab" aria-selected="${tplTab === 'daily'}" data-a="tplTab" data-t="daily">Дневни</button>
+      <button role="tab" aria-selected="${tplTab === 'weekly'}" data-a="tplTab" data-t="weekly">Недељни</button></div>` + body;
+  },
+  set(){
+    const perm = ('Notification' in window) ? Notification.permission : 'unsupported';
+    const nState = perm === 'unsupported' ? 'Овај прегледач не подржава обавештења.' : perm === 'denied' ? 'Обавештења су блокирана у подешавањима прегледача.' : (S.notif && perm === 'granted') ? 'Укључена.' : 'Искључена.';
+    return subHead('Подешавања') + `<div class="card">
+      <div class="set"><label>Име детета</label><p>${S.name ? esc(S.name) : 'Није унето'}</p><button class="btn ghost" data-a="name">Промени име</button></div>
+      <div class="set"><label>Подсетници</label><p>Сваког дана у 20:00 (да ли је све завршено) и недељом у 19:00 (припрема новог плана). Стижу док је апликација отворена или у позадини; иначе се приказују при следећем отварању. Стање: ${nState}</p>
+        <button class="btn ghost" data-a="notif">${S.notif && perm === 'granted' ? 'Искључи обавештења' : 'Укључи обавештења'}</button>
+        ${S.notif && perm === 'granted' ? ' <button class="btn ghost" data-a="notifTest">Пробај</button>' : ''}</div>
+      <div class="set"><label>Родитељски PIN</label><p>${S.pin ? 'PIN је постављен.' : 'PIN још није постављен.'}</p><button class="btn ghost" data-a="pinChange">${S.pin ? 'Промени PIN' : 'Постави PIN'}</button></div>
+      <div class="set"><label>Резервна копија</label><p>Подаци се чувају само на овом уређају. Повремено сачувај копију.</p>
+        <button class="btn ghost" data-a="export">Сачувај копију</button> <button class="btn ghost" data-a="import">Учитај копију</button>
+        <input type="file" id="imp" accept="application/json,.json" hidden></div>
+    </div>`;
+  }
+};
+function wkList(scope, k){
+  if (scope === 't') return S.weeklyT[k];
+  const mon = mondayOf(todayIso());
+  return ensureWeek(scope === 'cur' ? mon : addDays(mon, 7)).d[k];
+}
+function render(keepScroll){
+  const y = window.scrollY;
+  shownDay = todayIso();
+  $('#app').innerHTML = views[view]();
+  window.scrollTo(0, keepScroll ? y : 0);
+}
+function go(v){
+  document.body.classList.remove('menu');
+  const open = () => { view = v; openDays.clear(); render(); };
+  if (v === 'home') { unlocked = false; return open(); }
+  if (v === 'tpl') return requirePin(open);
+  open();
+}
+
+/* ---------- actions ---------- */
+const A = {
+  menuOpen(){ document.body.classList.add('menu'); },
+  menuClose(){ document.body.classList.remove('menu'); },
+  dlgClose: closeDlg,
+  go(ds){ go(ds.v); },
+  tab(ds){ homeTab = ds.t; render(true); },
+  tick(ds){
+    const d = ds.d, i = +ds.i;
+    if (d > todayIso()) return toast('Овај дан тек долази.');
+    const doIt = () => {
+      const list = ds.k === 'd' ? (S.days[d] || {}).daily : weekItems(d);
+      if (!list || !list[i]) return;
+      list[i].done = !list[i].done; save(); render(true);
+    };
+    canEdit(d) ? doIt() : requirePin(() => { render(true); doIt(); });
+  },
+  bannerOff(ds){ bannerOff[ds.b] = true; render(true); },
+  prepNext(){ requirePin(() => { view = 'tpl'; tplTab = 'weekly'; wkScope = 'next'; openDays.clear(); render(); }); },
+  calNav(ds){ const [y, m] = calMonth.split('-').map(Number); const d = new Date(y, m - 1 + (+ds.n), 1, 12); calMonth = iso(d).slice(0, 7); render(true); },
+  day(ds){ dayView = ds.d; view = 'day'; render(); },
+  tplTab(ds){ tplTab = ds.t; render(); },
+  scope(ds){ wkScope = ds.s; save(); render(true); },
+  dMove(ds){ const i = +ds.i, j = i + (+ds.n); if (j < 0 || j >= S.dailyT.length) return; [S.dailyT[i], S.dailyT[j]] = [S.dailyT[j], S.dailyT[i]]; syncTodayDaily(); save(); render(true); },
+  dDel(ds){ if (!confirm('Обрисати ову обавезу из шаблона?')) return; S.dailyT.splice(+ds.i, 1); syncTodayDaily(); save(); render(true); },
+  wAdd(ds){ wkList(wkScope, ds.k).push({id: uid(), subject: '', text: '', done: false}); save(); render(true);
+    const ins = document.querySelectorAll(`[data-c="wSubj"][data-k="${ds.k}"]`); if (ins.length) ins[ins.length - 1].focus(); },
+  wDel(ds){ wkList(wkScope, ds.k).splice(+ds.i, 1); save(); render(true); },
+  applyT(ds){ if (!confirm('Задаци те недеље биће замењени шаблоном (штиклирано остаје где се задатак поклапа). Наставити?')) return; applyTemplate(ds.m); save(); toast('Шаблон је примењен.'); },
+  prepared(){ ensureWeek(addDays(mondayOf(todayIso()), 7)).prepared = true; save(); render(true); toast('План је потврђен.'); },
+  name(){ askName(false); },
+  pinChange(){ requirePin(() => { S.pin = null; unlocked = false; save(); requirePin(() => { render(true); toast('PIN је сачуван.'); }); }); },
+  async notif(){
+    if (!('Notification' in window)) return toast('Обавештења нису подржана.');
+    if (S.notif && Notification.permission === 'granted') { S.notif = false; save(); return render(true); }
+    const p = await Notification.requestPermission();
+    S.notif = p === 'granted'; save(); render(true);
+    if (!S.notif) toast('Обавештења нису дозвољена.');
+  },
+  notifTest(){ notify('Моје обавезе', 'Овако ће изгледати подсетник. ✅', 'test'); },
+  export(){
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([JSON.stringify(S, null, 1)], {type: 'application/json'}));
+    a.download = 'obaveze-kopija-' + todayIso() + '.json'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  },
+  import(){ requirePin(() => $('#imp').click()); }
+};
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  const f = A[b.dataset.a]; if (f) f(b.dataset, b);
+});
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.id === 'imp') {
+    const file = el.files[0]; if (!file) return;
+    file.text().then(txt => {
+      const o = JSON.parse(txt);
+      if (!o || o.v !== 1 || !o.dailyT || !o.weeklyT) throw 0;
+      if (!confirm('Учитавање копије замениће све тренутне податке. Наставити?')) return;
+      S = o; save(); rollover(); render(); toast('Копија је учитана.');
+    }).catch(() => toast('Датотека није исправна копија.'));
+    return;
+  }
+  const c = el.dataset && el.dataset.c; if (!c) return;
+  const v = el.value.trim(), i = +el.dataset.i;
+  if (c === 'dText') { if (!v) { el.value = S.dailyT[i].text; return; } S.dailyT[i].text = v; syncTodayDaily(); }
+  if (c === 'wSubj') wkList(wkScope, el.dataset.k)[i].subject = v;
+  if (c === 'wText') wkList(wkScope, el.dataset.k)[i].text = v;
+  save();
+});
+document.addEventListener('submit', e => {
+  const f = e.target.dataset.f; if (f !== 'dAdd') return;
+  e.preventDefault();
+  const v = $('#dNew').value.trim(); if (!v) return;
+  S.dailyT.push({id: uid(), text: v}); syncTodayDaily(); save(); render(true); $('#dNew').focus();
+});
+document.addEventListener('toggle', e => {
+  const k = e.target.dataset && e.target.dataset.key; if (!k) return;
+  e.target.open ? openDays.add(k) : openDays.delete(k);
+}, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.body.classList.remove('menu'); });
+
+/* ---------- reminders ---------- */
+function notify(title, body, tag){
+  if (!S.notif || !('Notification' in window) || Notification.permission !== 'granted') return;
+  const opt = { body, tag, icon: 'icons/icon-192.png', badge: 'icons/icon-192.png', lang: 'sr-Cyrl' };
+  if (swReg) swReg.showNotification(title, opt).catch(() => {});
+  else { try { new Notification(title, opt); } catch(e) {} }
+}
+function tick(){
+  const now = new Date(), t = todayIso();
+  if (t !== shownDay) { rollover(); bannerOff = {}; if (view === 'home') render(true); }
+  let dirty = false;
+  const st = stats(t);
+  if (now.getHours() >= DAILY_HOUR && S.remD !== t) {
+    if (st && st.done < st.total) notify('Време је за проверу обавеза ⏰', `Остало је још ${st.total - st.done} од ${st.total}. Хајде да све завршимо!`, 'daily');
+    S.remD = t; dirty = true;
+  }
+  if (now.getDay() === 0 && now.getHours() >= WEEKLY_HOUR && S.remW !== t) {
+    if (!ensureWeek(addDays(mondayOf(t), 7)).prepared) notify('Припрема нове недеље 📚', 'Провери и потврди план учења за следећу недељу.', 'weekly');
+    S.remW = t; dirty = true;
+  }
+  if (dirty) { save(); if (view === 'home') render(true); }
+}
+
+/* ---------- start ---------- */
+load(); rollover(); render();
+if (!S.name && !S.lastNameAsk) { S.lastNameAsk = 1; save(); askName(true); }
+tick(); setInterval(tick, 30000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { tick(); if (view === 'home') render(true); } });
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  navigator.serviceWorker.register('sw.js').then(r => { swReg = r; }).catch(() => {});
+}
+</script>
+</body>
+</html>
